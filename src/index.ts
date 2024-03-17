@@ -25,6 +25,15 @@ export class KafkaService {
     })
     this.logger = this.kafka.logger()
     this.admin = this.kafka.admin()
+
+    this.logger.info('KafkaService initialized', {
+      brokers,
+      clientId,
+      requestTimeout,
+      retry,
+      initialRetryTime,
+      logLevel,
+    })
   }
 
   async createTopic(topic: string) {
