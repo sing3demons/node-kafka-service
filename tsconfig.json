@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2016" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
+    "target": "ES2020" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
     "outDir": "lib" /* Specify an output folder for all emitted files. */,
     "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
     "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
@@ -13,8 +13,8 @@
     "declaration": true,
     "skipLibCheck": true,
     "noImplicitAny": false,
-    "typeRoots": ["src/typings", "./node_modules/@types/"]
+    "typeRoots": ["typings", "./node_modules/@types/"]
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules"]
+  // "include": ["src/**/*.ts"],
+  // "exclude": ["node_modules"]
 }
