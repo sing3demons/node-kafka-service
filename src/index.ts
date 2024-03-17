@@ -7,7 +7,6 @@ export class KafkaService {
   private logger: Logger
   private admin: Admin
 
-  
   /**
    * Initializes the KafkaService.
    * env variables:
@@ -47,27 +46,39 @@ export class KafkaService {
     })
   }
 
-  
   /**
    * Creates a Kafka topic.
-   * 
+   *
    * @param topic - The name of the topic to create. :: ex => topic=topic1,topic2
    * @returns A promise that resolves when the topic is created.
    */
   async createTopic(topic: string) {
-    const topics: ITopicConfig[] = topic.split(',').map((topic) => ({ topic }))
+    // const topics: ITopicConfig[] = topic.split(',').map((topic) => ({ topic }))
+    const topics = topic.split(',')
 
     await this.admin.connect()
-    await this.admin.createTopics({
-      topics: topics,
+
+    const listTopic = await this.admin.listTopics()
+    const existingTopics = listTopic.filter((t) => topics.includes(t))
+    const newTopics = topics.filter((t) => !existingTopics.includes(t))
+
+    if (newTopics.length) {
+      await this.admin.createTopics({
+        topics: newTopics.map((topic) => ({
+          topic,
+          numPartitions: 1,
+        })),
+      })
+    }
+    this.logger.info(`Created topic`, {
+      topics: newTopics,
     })
-    this.logger.info(`Created topic: ${topic}`)
     await this.admin.disconnect()
   }
 
   /**
    * Sends a message to a Kafka topic.
-   * 
+   *
    * @param topic - The name of the Kafka topic.
    * @param message - The message to be sent. It can be an array of objects, a single object, or a string.
    * @param headers - Optional headers to be included in the message.
