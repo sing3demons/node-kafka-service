@@ -1,4 +1,4 @@
-import { Kafka, Message, Logger, Admin, IHeaders } from 'kafkajs'
+import { Kafka, Message, Logger, Admin, IHeaders, ITopicConfig } from 'kafkajs'
 
 type MessageCallback = (topic: string, message: string | undefined) => void
 
@@ -28,9 +28,11 @@ export class KafkaService {
   }
 
   async createTopic(topic: string) {
+    const topics: ITopicConfig[] = topic.split(',').map((topic) => ({ topic }))
+
     await this.admin.connect()
     await this.admin.createTopics({
-      topics: [{ topic }],
+      topics: topics,
     })
     this.logger.info(`Created topic: ${topic}`)
     await this.admin.disconnect()
