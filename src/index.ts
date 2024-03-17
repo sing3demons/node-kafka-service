@@ -1,4 +1,4 @@
-import { Kafka, Message, Logger, Admin, IHeaders, ITopicConfig } from 'kafkajs'
+import { Kafka, Message, Logger, Admin, IHeaders, ITopicConfig, KafkaConfig } from 'kafkajs'
 
 type MessageCallback = (topic: string, message: string | undefined) => void
 
@@ -24,7 +24,8 @@ export class KafkaService {
     const retry = process.env?.KAFKA_RETRY ?? 8
     const initialRetryTime = process.env?.KAFKA_INITIAL_RETRY_TIME ?? 100
     const logLevel = process.env?.KAFKA_LOG_LEVEL ?? 0
-    this.kafka = new Kafka({
+
+    const config: KafkaConfig = {
       clientId,
       brokers,
       requestTimeout: Number(requestTimeout),
@@ -32,7 +33,36 @@ export class KafkaService {
         initialRetryTime: Number(initialRetryTime),
         retries: Number(retry),
       },
-    })
+    }
+
+    const TIME_OUT = process.env?.KAFKA_CONNECTION_TIMEOUT
+    if (TIME_OUT) {
+      config.connectionTimeout = Number(TIME_OUT)
+    }
+
+    const SSL_CA = process.env?.KAFKA_SSL_CA
+    const SSL_CERT = process.env?.KAFKA_SSL_CERT
+    const SSL_KEY = process.env?.KAFKA_SSL_KEY
+    if (SSL_CA && SSL_CERT && SSL_KEY) {
+      config.ssl = {
+        ca: SSL_CA,
+        cert: SSL_CERT,
+        key: SSL_KEY,
+      }
+    }
+
+    // sasl
+    const SASL_USERNAME = process.env?.KAFKA_SASL_USERNAME
+    const SASL_PASSWORD = process.env?.KAFKA_SASL_PASSWORD
+    if (SASL_USERNAME && SASL_PASSWORD) {
+      config.sasl = {
+        mechanism: 'plain',
+        username: SASL_USERNAME,
+        password: SASL_PASSWORD,
+      }
+    }
+
+    this.kafka = new Kafka(config)
     this.logger = this.kafka.logger()
     this.admin = this.kafka.admin()
 
